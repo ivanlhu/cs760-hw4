@@ -1,0 +1,407 @@
+\documentclass[a4paper]{article}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{natbib}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{paralist}
+\usepackage{epstopdf}
+\usepackage{tabularx}
+\usepackage{longtable}
+\usepackage{multirow}
+\usepackage{multicol}
+\usepackage[hidelinks]{hyperref}
+\usepackage{fancyvrb}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{float}
+\usepackage{paralist}
+\usepackage[svgname]{xcolor}
+\usepackage{enumerate}
+\usepackage{array}
+\usepackage{times}
+\usepackage{url}
+\usepackage{fancyhdr}
+\usepackage{comment}
+\usepackage{environ}
+\usepackage{times}
+\usepackage{textcomp}
+\usepackage{caption}
+\usepackage{bbm}
+\usepackage{enumitem}
+
+
+\urlstyle{rm}
+
+\setlength\parindent{0pt} % Removes all indentation from paragraphs
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[]
+\newtheorem{conjecture}{Conjecture}[]
+\newtheorem{example}{Example}[]
+\newtheorem{theorem}{Theorem}[]
+\newtheorem{lemma}{Lemma}
+\newtheorem{proposition}{Proposition}
+\newtheorem{corollary}{Corollary}
+
+\floatname{algorithm}{Procedure}
+\renewcommand{\algorithmicrequire}{\textbf{Input:}}
+\renewcommand{\algorithmicensure}{\textbf{Output:}}
+\newcommand{\abs}[1]{\lvert#1\rvert}
+\newcommand{\norm}[1]{\lVert#1\rVert}
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\CC}{\mathbb{C}}
+\newcommand{\Nat}{\mathbb{N}}
+\newcommand{\br}[1]{\{#1\}}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\renewcommand{\qedsymbol}{$\blacksquare$}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\newcommand{\Var}{\mathrm{Var}}
+\newcommand{\Cov}{\mathrm{Cov}}
+
+\newcommand{\vc}[1]{\boldsymbol{#1}}
+\newcommand{\xv}{\vc{x}}
+\newcommand{\Sigmav}{\vc{\Sigma}}
+\newcommand{\alphav}{\vc{\alpha}}
+\newcommand{\muv}{\vc{\mu}}
+
+\newcommand{\red}[1]{\textcolor{red}{#1}}
+\newcommand{\blue}[1]{\textcolor{blue}{#1}}
+
+\def\x{\mathbf x}
+\def\y{\mathbf y}
+\def\w{\mathbf w}
+\def\v{\mathbf v}
+\def\E{\mathbb E}
+\def\V{\mathbb V}
+\def\ind{\mathbbm 1}
+
+% TO SHOW SOLUTIONS, include following (else comment out):
+\newenvironment{soln}{
+    \leavevmode\color{blue}\ignorespaces
+}{}
+
+
+\hypersetup{
+%    colorlinks,
+    linkcolor={red!50!black},
+    citecolor={blue!50!black},
+    urlcolor={blue!80!black}
+}
+
+\geometry{
+  top=1in,            % <-- you want to adjust this
+  inner=1in,
+  outer=1in,
+  bottom=1in,
+  headheight=3em,       % <-- and this
+  headsep=2em,          % <-- and this
+  footskip=3em,
+}
+
+
+\pagestyle{fancyplain}
+\lhead{\fancyplain{}{Homework 4}}
+\rhead{\fancyplain{}{CS 760 Machine Learning}}
+\cfoot{\thepage}
+
+\title{\textsc{Homework 4}} % Title
+
+%%% NOTE:  Replace 'NAME HERE' etc., and delete any "\red{}" wrappers (so it won't show up as red)
+
+\author{
+Ivan Hu\\
+9081641624\\
+} 
+
+\date{}
+
+\begin{document}
+
+\maketitle 
+
+
+\textbf{Instructions:} Use this latex file as a template to develop your homework. Submit your homework on time as a single pdf file to Canvas. Late submissions may not be accepted. Please wrap your code and upload to a public GitHub repo, then attach the link below the instructions so that we can access it. You can choose any programming language (i.e. python, R, or MATLAB). Please check Piazza for updates about the homework.
+
+\section{Best Prediction Under 0-1 Loss (10 pts)}
+Suppose the world generates a single observation $x \sim \mbox{multinomial}(\theta)$, where the parameter vector $\theta=(\theta_1, \ldots, \theta_k)$ with $\theta_i\ge 0$ and $\sum_{i=1}^k \theta_i=1$.  Note $x \in \{1, \ldots, k\}$.
+You know $\theta$ and want to predict $x$. 
+Call your prediction $\hat x$.  What is your expected 0-1 loss: 
+$$\E[\ind_{\hat x \neq x}]$$
+using the following two prediction strategies respectively?  Prove your answer.
+
+
+Strategy 1: $\hat x \in \argmax_x \theta_x$, the outcome with the highest probability.
+
+Strategy 2: You mimic the world by generating a prediction $\hat x \sim \mbox{multinomial}(\theta)$.  (Hint: your randomness and the world's randomness are independent)
+
+\begin{soln}
+  \begin{enumerate}
+    \item Let $\theta_{\hat{x}}$ be the probability of the outcome $\hat x$ with the highest probability. The loss is the probability that $\hat x$ is not chosen, or $1-\theta_{\hat x}$.
+
+    \item Given an outcome $x$, the probability $x$ is predicted is $\theta_{x}$, and the expected loss given that $x$ is predicted is $1-\theta_{x}$. Therefore, the expected loss is $\sum_{x}\theta_{x}(1-\theta_{x})$.
+  \end{enumerate}
+\end{soln}
+
+\section{Best Prediction Under Different Misclassification Losses (6 pts)}
+Like in the previous question, 
+the world generates a single observation $x \sim \mbox{multinomial}(\theta)$.
+Let $c_{ij} \ge 0$ denote the loss you incur, if $x=i$ but you predict $\hat x=j$, for $i,j \in \{1, \ldots, k\}$.
+$c_{ii}=0$ for all $i$.
+This is a way to generalize different costs on false positives vs false negatives from binary classification to multi-class classification.
+You want to minimize your expected loss:
+$$\E[c_{x \hat x}]$$
+Derive your optimal prediction $\hat x$.
+
+\begin{soln}
+    If $\hat x$ is the prediction, the probability that the true class is $x$ is $\theta_x$, and the corresponding cost is $c_{x\hat{x}}$ (this includes $x=\hat{x}$, as $c_{\hat{x}\hat{x}}=0$). Therefore, the optimal $\hat x$ is given by 
+\[\hat{x} = \argmin_{x} \sum_{x} \theta_x c_{x\hat{x}}. \]
+\end{soln}
+
+\section{Language Identification with Naive Bayes (8 pts each)}
+Implement a character-based Naive Bayes classifier that classifies a document as English, Spanish, or Japanese - all written with the 26 lower case characters and space.
+
+The dataset is languageID.tgz, unpack it.
+This dataset consists of 60 documents in English, Spanish and Japanese. 
+The correct class label is the first character of the filename: $y \in \{e, j, s\}$. (Note: here each file is a document in corresponding language, and it is regarded as one data.)
+
+We will be using a character-based multinomial Naïve Bayes model.  You need to view each document as a bag of characters, including space.  We have made sure that there are only 27 different types of printable characters (a to z, and space) -- there may be additional control characters such as new-line, please ignore those.  Your vocabulary will be these 27 character types. (Note: not word types!)
+
+
+\begin{enumerate}
+\item
+Use files 0.txt to 9.txt in each language as the training data.
+Estimate the prior probabilities 
+$\hat p(y=e)$,
+$\hat p(y=j)$,
+$\hat p(y=s)$
+using additive smoothing with parameter $\frac{1}{2}$. 
+Give the formula for additive smoothing with parameter $\frac{1}{2}$ in this case. 
+Print and include in final report the prior probabilities.
+(Hint: Store all probabilities here and below in $\log()$ internally to avoid underflow. This also means you need to do arithmetic in log-space.  But answer questions with probability, not log probability.)
+
+\begin{soln}
+    Additive smoothing formula: let $N$ be the total number of characters, and let $N_e$ be the number of characters in class $e$. The smoothed probability is
+    \[ \frac{N_e+\frac{1}{2}}{N+\frac{3}{2}}. \]
+
+\begin{verbatim}
+English: 0.3314335192958997
+Japanese: 0.31339259291734717
+Spanish: 0.3551738877867532
+\end{verbatim}
+\end{soln}
+
+\item
+Using the same training data, estimate the class conditional probability (multinomial parameter) for English
+$$\theta_{i,e} := \hat p(c_i \mid y=e)$$ 
+where $c_i$ is the $i$-th character. That is, $c_1 = a, \ldots, c_{26} = z, c_{27} = space$.
+Again use additive smoothing with parameter $\frac{1}{2}$.
+Give the formula for additive smoothing with parameter $\frac{1}{2}$ in this case. 
+Print $\theta_e$ and include in final report which is a vector with 27 elements.
+
+\begin{soln}
+   The smoothed probability is
+    \[ \theta_{i,e}=\frac{c_{i,e}+\frac{1}{2}}{N_e+\frac{27}{2}}. \]
+    
+
+\begin{verbatim}
+English letter probabilities:
+  a: 6.016851e-2
+  b: 1.113497e-2
+  c: 2.151000e-2
+  d: 2.197258e-2
+  e: 1.053692e-1
+  f: 1.893276e-2
+  g: 1.747894e-2
+  h: 4.721626e-2
+  i: 5.541054e-2
+  j: 1.420783e-3
+  k: 3.733686e-3
+  l: 2.897737e-2
+  m: 2.051875e-2
+  n: 5.792169e-2
+  o: 6.446390e-2
+  p: 1.675202e-2
+  q: 5.617049e-4
+  r: 5.382455e-2
+  s: 6.618206e-2
+  t: 8.012556e-2
+  u: 2.666446e-2
+  v: 9.284652e-3
+  w: 1.549645e-2
+  x: 1.156451e-3
+  y: 1.384437e-2
+  z: 6.277879e-4
+spc: 6.277879e-4
+\end{verbatim}
+\end{soln}
+
+\item
+Print $\theta_j, \theta_s$ and include in final report the class conditional probabilities for Japanese and Spanish.
+
+\begin{soln}
+\begin{verbatim}
+Japanese letter probabilities:
+  a: 1.317656e-1
+  b: 1.086691e-2
+  c: 5.485866e-3
+  d: 1.722632e-2
+  e: 6.020476e-2
+  f: 3.878542e-3
+  g: 1.401167e-2
+  h: 3.176212e-2
+  i: 9.703344e-2
+  j: 2.341102e-3
+  k: 5.740941e-2
+  l: 1.432615e-3
+  m: 3.979874e-2
+  n: 5.671058e-2
+  o: 9.116321e-2
+  p: 8.735455e-4
+  q: 1.048255e-4
+  r: 4.280373e-2
+  s: 4.217478e-2
+  t: 5.699011e-2
+  u: 7.061742e-2
+  v: 2.445928e-4
+  w: 1.974213e-2
+  x: 3.494182e-5
+  y: 1.415144e-2
+  z: 7.722143e-3
+spc: 7.722143e-3
+ 
+Spanish letter probabilities:
+  a: 1.045605e-1
+  b: 8.232864e-3
+  c: 3.752582e-2
+  d: 3.974592e-2
+  e: 1.138109e-1
+  f: 8.602880e-3
+  g: 7.184484e-3
+  h: 4.532700e-3
+  i: 4.985970e-2
+  j: 6.629459e-3
+  k: 2.775123e-4
+  l: 5.294317e-2
+  m: 2.580864e-2
+  n: 5.417656e-2
+  o: 7.249237e-2
+  p: 2.426691e-2
+  q: 7.677839e-3
+  r: 5.929512e-2
+  s: 6.577040e-2
+  t: 3.561407e-2
+  u: 3.370232e-2
+  v: 5.889427e-3
+  w: 9.250409e-5
+  x: 2.497610e-3
+  y: 7.862847e-3
+  z: 2.682618e-3
+spc: 2.682618e-3
+\end{verbatim}
+\end{soln}
+
+\item
+Treat e10.txt as a test document $x$.
+Represent $x$ as a bag-of-words count vector (Hint: the vocabulary has size 27).
+Print the bag-of-words vector $x$ and include in final report.
+
+\begin{soln}
+\[ x=[164, 32, 53, 57, 311, 55, 51, 140, 140, 3, 6, 85, 64, 139, 182, 53, 3, 141, 186, 225, 65, 31, 47, 4, 38, 2, 498] \]
+\end{soln}
+
+\item
+Compute $\hat p(x \mid y)$ for $y=e, j, s$ under the multinomial model assumption, respectively.
+Use the formula
+$$\hat p(x \mid y) = \prod_{i=1}^d \theta_{i, y}^{x_i}$$
+where $x=(x_1, \ldots, x_d)$.
+Show the three values: $\hat p(x \mid y=e), \hat p(x \mid y=j), \hat p(x \mid y=s)$.
+Hint: you may notice that we omitted the multinomial coefficient.  This is ok for classification because it is a constant w.r.t. $y$.
+
+\begin{soln}
+\begin{verbatim}
+Probability given lang='e':
+2.094636e-3406
+Probability given lang='j':
+4.121121e-3810
+Probability given lang='s':
+5.083134e-3678
+\end{verbatim}
+
+\end{soln}
+
+\item
+Use Bayes rule and your estimated prior and likelihood, compute the posterior $\hat p(y \mid x)$.
+Show the three values: $\hat p(y=e \mid x), \hat p(y=j \mid x), \hat p(y=s \mid x)$.
+Show the predicted class label of $x$.
+
+\begin{soln}
+    Posterior probability of $y=\hat{y}$ given $x$:
+    \[ \hat{p}(y=\hat{y}\mid x) = \frac{\hat{p}(x\mid y=\hat{y})}{\hat{p}(x)}\cdot \hat{p}(y=\hat{y}). \]
+    For each language, this evaluates to 
+    \[ \hat{p}(y=e\mid x) = 5.315951\cdot 10^{68} \]
+    \[ \hat{p}(y=j\mid x) = 9.889633\cdot 10^{-336} \]
+    \[ \hat{p}(y=s\mid x) = 1.382448\cdot 10^{-203}\]
+    The predicted label of $x$ is `e'. The probabilities do not add up to 1 due to the implicit multinomial coefficient.
+\end{soln}
+
+\item
+Evaluate the performance of your classifier on the test set (files 10.txt to 19.txt in three languages).
+Present the performance using a confusion matrix. A confusion matrix summarizes the types of errors your classifier makes, as shown in the table below.   The columns are the true language a document is in, and the rows are the classified outcome of that document.  The cells are the number of test documents in that situation.  For example, the cell with row = English and column = Spanish contains the number of test documents that are really Spanish, but misclassified as English by your classifier.
+
+\begin{soln}
+    Column is true class, row is predicted class
+    \begin{center}
+       \begin{tabular}{c|ccc}
+            & e & j & s\\\hline
+           e & 10 & 0 & 0\\
+           j & 0 & 10 & 0\\
+           s & 0 & 0 & 10
+       \end{tabular}
+    \end{center}
+\end{soln}
+
+\item If you take a test document and arbitrarily shuffle the order of its characters so that the words (and spaces) are scrambled beyond human recognition.  How does this shuffling affect your Naive Bayes classifier's prediction on this document?  Explain the key mathematical step in the Naive Bayes model that justifies your answer.
+
+\begin{soln}
+    Shuffling words and spaces will not affect the prediction of a Naive Bayes classifier. First of all, the bag of words model only counts frequencies of words and not their order. Second, Naive Bayes considers each feature to be independent of the other features (the probability that $y=\hat{y}$ given all features $x_1,\dots,x_n$ equal $\hat{x}_1,\dots,\hat{x}_n$ is equal to the product of the probabilities that $y=\hat{y}$ given $x_i=\hat{x}_i$). Shuffling characters will not affect the product.
+\end{soln}
+
+\end{enumerate}
+
+\section{Simple Feed-Forward Network (20pts)}
+In this exercise, you will derive, implement back-propagation for a simple neural network and compare your output with some standard library’s output. Consider the following 3-layer neural network.
+
+\[
+\hat{y} = f(x) = g(W_2\sigma(W_1x))
+\]
+
+Suppose $x \in \mathbb{R}^d$, $W_1 \in \mathbb{R}^{d_1 \times d}$, and $W_2 \in \mathbb{R}^{k \times d_1}$ i.e. $f: \mathbb{R}^d \rightarrow \mathbb{R}^k$, Let $\sigma(z) = [\sigma(z_1), ..., \sigma(z_n)]$ for any $z \in \mathbb{R}^n$ where $\sigma(z) = \frac{1}{1 + e^{-z}}$ is the sigmoid (logistic) activation function and $g(z_i) = \frac{exp(z_i)}{\sum_{i=1}^k exp(z_i)}$ is the softmax function. Suppose the true pair is $(x, y)$ where $y \in \{0, 1\}^k$ with exactly one of the entries equal to 1, and you are working with the cross-entropy loss function given below,
+
+\[
+L(x, y) = -\sum_{i=1}^k y \text{log}(\hat{y})
+\]
+
+\begin{enumerate}
+    \item Derive backpropagation updates for the above neural network. (5 pts)
+
+\begin{soln}
+    Let $a=W_1x$, $b=\sigma(a)$, $c=W_2b$. We have that $\hat{y}=g(c)$, so
+    \[\frac{\partial L}{\partial (W_2)_{ij}} = \frac{\partial L}{\partial \hat{y}}\frac{\partial \hat{y}}{\partial c_i}\frac{\partial c_i}{\partial (W_2)_{ij}}
+    =  \]
+\end{soln}
+
+    \item Implement it in NumPy or PyTorch using basic linear algebra operations. (e.g. You are not allowed to use auto-grad, built-in optimizer, model, etc. in this step. You can use library functions for data loading, processing, etc.). Evaluate your implementation on MNIST dataset, report test errors and learning curve. (10 pts)
+    \item Implement the same network in PyTorch (or any other framework). You can use all the features of the framework e.g. auto-grad etc. Evaluate it on MNIST dataset, report test errors, and learning curve. (2 pts)
+    \item Try different weight initialization a) all weights initialized to 0, and b) initialize the weights randomly between -1 and 1. Report test error and learning curves for both. (You can use either of the implementations) (3 pts)
+\end{enumerate}
+
+You should play with different hyperparameters like learning rate, batch size, etc. for your own learning. You only need to report results for any particular setting of hyperparameters. You should mention the values of those along with the results. Use $d_1 = 300$, $d_2 = 200$. For optimization use SGD (Stochastic gradient descent) without momentum, with some batch size say 32, 64, etc. MNIST can be obtained from here (https://pytorch.org/vision/ stable/datasets.html)
+
+\bibliographystyle{apalike}
+\end{document}
